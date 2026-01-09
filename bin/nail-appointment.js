@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import * as cdk from 'aws-cdk-lib/core';
-import { NailAppointmentStack } from '../lib/nail-appointment-stack';
+const cdk = require('aws-cdk-lib');
+const { NailAppointmentStack } = require('../lib/nail-appointment-stack');
 
 const app = new cdk.App();
 new NailAppointmentStack(app, 'NailAppointmentStack', {

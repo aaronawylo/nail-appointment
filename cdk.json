@@ -1,15 +1,12 @@
 {
-  "app": "npx ts-node --prefer-ts-exts bin/nail-appointment.ts",
+  "app": "node bin/nail-appointment.js",
   "watch": {
-    "include": [
-      "**"
-    ],
+    "include": ["**"],
     "exclude": [
       "README.md",
       "cdk*.json",
       "**/*.d.ts",
-      "**/*.js",
-      "tsconfig.json",
+      "**/*.ts",
       "package*.json",
       "yarn.lock",
       "node_modules",
