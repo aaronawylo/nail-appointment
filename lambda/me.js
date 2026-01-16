@@ -1,9 +1,6 @@
-// lambda/me.js
 exports.handler = async (event) => {
-  console.log(JSON.stringify(event)); // always log the event during debugging
-
+  console.log(JSON.stringify(event));
   const claims = event.requestContext?.authorizer?.claims || {};
-
   return {
     statusCode: 200,
     body: JSON.stringify({
@@ -12,5 +9,3 @@ exports.handler = async (event) => {
     }),
   };
 };
-
-
