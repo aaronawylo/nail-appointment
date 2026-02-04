@@ -27,7 +27,7 @@ exports.handler = async (event) => {
     const appointments = result.Items.map((item) => ({
       userId: item.userId.S,
       appointmentTime: item.appointmentTime.S,
-      userName: item.userName ? item.userName.S : "Unknown Customer", // Extract the name!
+      userName: item.userName ? item.userName.S : "Unknown Customer",
       service: item.service ? item.service.S : "Nail Service"
     }));
 

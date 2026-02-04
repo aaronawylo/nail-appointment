@@ -3,7 +3,6 @@ const client = new DynamoDBClient({ region: process.env.REGION });
 
 exports.handler = async () => {
   const data = await client.send(new ScanCommand({ TableName: process.env.TABLE_NAME }));
-  // Only return the times, hide names and IDs!
   const times = (data.Items || []).map(item => item.appointmentTime.S);
   
   return {

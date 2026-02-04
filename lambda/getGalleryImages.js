@@ -9,7 +9,6 @@ const CORS_HEADERS = {
 };
 
 exports.handler = async (event) => {
-  console.log("Fetching images from bucket:", process.env.BUCKET_NAME); // DEBUG LOG
 
   try {
     const bucketName = process.env.BUCKET_NAME;
@@ -19,12 +18,9 @@ exports.handler = async (event) => {
       Bucket: bucketName,
     });
 
-    // CRITICAL: We must 'await' the result
     const data = await client.send(command);
     
-    console.log("S3 Response Data:", JSON.stringify(data)); // DEBUG LOG
 
-    // In SDK v3, 'Contents' is undefined if the bucket is empty or filtered
     const images = (data.Contents || []).map((file) => ({
       key: file.Key,
       url: `https://${bucketName}.s3.${region}.amazonaws.com/${file.Key}`

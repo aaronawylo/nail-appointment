@@ -9,7 +9,6 @@ const CORS_HEADERS = {
 };
 
 exports.handler = async (event) => {
-  // 1. Handle the browser's "pre-check" (OPTIONS)
   if (event.httpMethod === 'OPTIONS') {
     return { 
       statusCode: 200, 
@@ -21,7 +20,6 @@ exports.handler = async (event) => {
   try {
     const { userId, appointmentTime } = JSON.parse(event.body);
 
-    // 2. Perform the actual delete
     await client.send(new DeleteItemCommand({
       TableName: process.env.TABLE_NAME,
       Key: {
@@ -32,7 +30,7 @@ exports.handler = async (event) => {
 
     return { 
       statusCode: 200, 
-      headers: CORS_HEADERS, // MUST include these here too!
+      headers: CORS_HEADERS,
       body: JSON.stringify({ message: "Appointment deleted" }) 
     };
   } catch (err) {
