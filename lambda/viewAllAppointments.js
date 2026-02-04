@@ -10,7 +10,6 @@ const CORS_HEADERS = {
 
 exports.handler = async (event) => {
   try {
-    // 1. Extra Security Check: Verify the "admin" group is in the token
     const claims = event.requestContext?.authorizer?.claims;
     const groups = claims['cognito:groups'] || "";
     
@@ -22,17 +21,16 @@ exports.handler = async (event) => {
       };
     }
 
-    // 2. Fetch all appointments from DynamoDB
     const params = { TableName: process.env.TABLE_NAME };
     const result = await client.send(new ScanCommand(params));
 
-    // 3. Map the DynamoDB format to clean JSON
     const appointments = result.Items.map((item) => ({
       userId: item.userId.S,
       appointmentTime: item.appointmentTime.S,
+      userName: item.userName ? item.userName.S : "Unknown Customer", // Extract the name!
+      service: item.service ? item.service.S : "Nail Service"
     }));
 
-    // 4. Sort by time (soonest first)
     appointments.sort((a, b) => new Date(a.appointmentTime) - new Date(b.appointmentTime));
 
     return {

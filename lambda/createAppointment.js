@@ -1,50 +1,69 @@
-const { DynamoDBClient, PutItemCommand } = require("@aws-sdk/client-dynamodb");
+const { DynamoDBClient, PutItemCommand, QueryCommand } = require("@aws-sdk/client-dynamodb");
 const client = new DynamoDBClient({ region: process.env.REGION });
 
 const CORS_HEADERS = {
   "Access-Control-Allow-Origin": "http://localhost:3000",
-  "Access-Control-Allow-Credentials": true,
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
-  "Access-Control-Allow-Methods": "POST,OPTIONS"
+  "Access-Control-Allow-Methods": "POST,OPTIONS",
+  "Access-Control-Allow-Credentials": true
 };
 
 exports.handler = async (event) => {
-  console.log('Event:', JSON.stringify(event));
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: CORS_HEADERS };
 
   try {
-    const claims = event.requestContext?.authorizer?.claims;
-    if (!claims?.sub) {
-      return { 
-        statusCode: 401, 
+    const body = JSON.parse(event.body);
+    const { appointmentTime, service } = body;
+    const claims = event.requestContext.authorizer.claims;
+    
+    // Get names from Cognito registration
+    const fullName = `${claims['given_name']} ${claims['family_name']}`;
+    const userId = claims.sub;
+
+    // 1. Check if time slot is already taken
+    const checkQuery = new QueryCommand({
+      TableName: process.env.TABLE_NAME,
+      IndexName: 'TimeIndex',
+      KeyConditionExpression: 'appointmentTime = :t',
+      ExpressionAttributeValues: { ':t': { S: appointmentTime } }
+    });
+
+    const existing = await client.send(checkQuery);
+
+    if (existing.Items && existing.Items.length > 0) {
+      return {
+        statusCode: 400,
         headers: CORS_HEADERS,
-        body: JSON.stringify({ message: 'Unauthorized' }) 
+        body: JSON.stringify({ message: "That time slot is already booked!" }),
       };
     }
 
-    const userId = claims.sub;
-    const body = JSON.parse(event.body);
-
-    const params = {
+    // 2. Save appointment with the user's name
+    const putCommand = new PutItemCommand({
       TableName: process.env.TABLE_NAME,
       Item: {
         userId: { S: userId },
-        appointmentTime: { S: body.appointmentTime }
+        appointmentTime: { S: appointmentTime },
+        userName: { S: fullName },
+        service: { S: service || 'Nail Service' },
+        createdAt: { S: new Date().toISOString() }
       }
-    };
+    });
 
-    await client.send(new PutItemCommand(params));
+    await client.send(putCommand);
 
     return {
-      statusCode: 200,
+      statusCode: 201,
       headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Appointment created', appointmentTime: body.appointmentTime }),
+      body: JSON.stringify({ message: "Booking successful!", userName: fullName }),
     };
+
   } catch (err) {
     console.error(err);
-    return { 
-      statusCode: 500, 
+    return {
+      statusCode: 500,
       headers: CORS_HEADERS,
-      body: JSON.stringify({ message: 'Internal server error' }) 
+      body: JSON.stringify({ message: "Internal Server Error", error: err.message }),
     };
   }
 };
