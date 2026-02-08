@@ -7,7 +7,7 @@ exports.handler = async () => {
   
   return {
     statusCode: 200,
-    headers: { "Access-Control-Allow-Origin": "http://localhost:3000" },
+    headers: { "Access-Control-Allow-Origin": "https://main.d39cw2djhxzpjt.amplifyapp.com" },
     body: JSON.stringify({ bookedSlots: times }),
   };
 };

@@ -16,7 +16,7 @@ exports.handler = async (event) => {
         return {
             statusCode: 200,
             headers: { 
-                "Access-Control-Allow-Origin": "http://localhost:3000",
+                "Access-Control-Allow-Origin": "https://main.d39cw2djhxzpjt.amplifyapp.com",
                 "Access-Control-Allow-Headers": "Content-Type,Authorization" 
             },
             body: JSON.stringify({ uploadUrl })

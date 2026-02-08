@@ -2,7 +2,7 @@ const { S3Client, ListObjectsV2Command } = require("@aws-sdk/client-s3");
 const client = new S3Client({ region: process.env.REGION });
 
 const CORS_HEADERS = {
-  "Access-Control-Allow-Origin": "http://localhost:3000",
+  "Access-Control-Allow-Origin": "https://main.d39cw2djhxzpjt.amplifyapp.com",
   "Access-Control-Allow-Headers": "Content-Type,Authorization",
   "Access-Control-Allow-Methods": "GET,OPTIONS",
   "Access-Control-Allow-Credentials": true
